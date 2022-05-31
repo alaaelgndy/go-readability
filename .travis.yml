@@ -7,7 +7,7 @@ matrix:
     - go: "1.13"
 
 install:
-  - go get github.com/go-shiori/go-readability
+  - go get github.com/alaaelgndy/go-readability
 
 script:
   - go get -t -v ./...
