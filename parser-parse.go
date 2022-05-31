@@ -117,25 +117,19 @@ func (ps *Parser) ParseDocument(doc *html.Node, pageURL *nurl.URL) (Article, err
 	datePublished := ps.getDate(metadata, "datePublished")
 	dateModified := ps.getDate(metadata, "dataModified")
 
-	var date time.Time
-	if raw, ok := metadata["date"]; ok && raw != "" {
-		date, _ = time.Parse(time.RFC3339, raw)
-	}
-
 	return Article{
-		Title:           validTitle,
-		Byline:          validByline,
-		Node:            readableNode,
-		Content:         finalHTMLContent,
-		TextContent:     finalTextContent,
-		Length:          charCount(finalTextContent),
-		Excerpt:         validExcerpt,
-		SiteName:        metadata["siteName"],
-		Image:           metadata["image"],
-		Favicon:         metadata["favicon"],
-		PublishedTime:   datePublished,
-		PublishedTimeV2: date,
-		ModifiedTime:    dateModified,
+		Title:         validTitle,
+		Byline:        validByline,
+		Node:          readableNode,
+		Content:       finalHTMLContent,
+		TextContent:   finalTextContent,
+		Length:        charCount(finalTextContent),
+		Excerpt:       validExcerpt,
+		SiteName:      metadata["siteName"],
+		Image:         metadata["image"],
+		Favicon:       metadata["favicon"],
+		PublishedTime: datePublished,
+		ModifiedTime:  dateModified,
 	}, nil
 }
 

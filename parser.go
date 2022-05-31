@@ -85,19 +85,18 @@ type parseAttempt struct {
 
 // Article is the final readable content.
 type Article struct {
-	Title           string
-	Byline          string
-	Node            *html.Node
-	Content         string
-	TextContent     string
-	Length          int
-	Excerpt         string
-	SiteName        string
-	Image           string
-	Favicon         string
-	PublishedTime   *time.Time
-	ModifiedTime    *time.Time
-	PublishedTimeV2 time.Time
+	Title         string
+	Byline        string
+	Node          *html.Node
+	Content       string
+	TextContent   string
+	Length        int
+	Excerpt       string
+	SiteName      string
+	Image         string
+	Favicon       string
+	PublishedTime *time.Time
+	ModifiedTime  *time.Time
 }
 
 // Parser is the parser that parses the page to get the readable content.
@@ -1236,21 +1235,10 @@ func (ps *Parser) getJSONLD() (map[string]string, error) {
 	content := rxCDATA.ReplaceAllString(dom.TextContent(jsonLdElement), "")
 
 	// Decode JSON
-	var data interface{}
-	err := json.Unmarshal([]byte(content), &data)
+	var parsed map[string]interface{}
+	err := json.Unmarshal([]byte(content), &parsed)
 	if err != nil {
 		return nil, err
-	}
-	var parsed map[string]interface{}
-	switch actual := data.(type) {
-	case map[string]interface{}:
-		parsed = actual
-	case []interface{}:
-		if len(actual) > 0 {
-			if internal, ok := actual[0].(map[string]interface{}); ok {
-				parsed = internal
-			}
-		}
 	}
 
 	// Check context
@@ -1414,14 +1402,6 @@ func (ps *Parser) getArticleMetadata(jsonLd map[string]string) map[string]string
 		values["description"],
 		values["twitter:description"])
 
-	// get published date
-	metadataDate := strOr(
-		jsonLd["datePublished"],
-		values["article:published_time"],
-		jsonLd["dateModified"],
-		values["article:modified_time"],
-	)
-
 	// get site name
 	metadataSiteName := strOr(jsonLd["siteName"], values["og:site_name"])
 
@@ -1456,7 +1436,6 @@ func (ps *Parser) getArticleMetadata(jsonLd map[string]string) map[string]string
 		"favicon":       metadataFavicon,
 		"datePublished": metadataDatePublished,
 		"dateModified":  metadataDateModified,
-		"date":          metadataDate,
 	}
 }
 
@@ -1551,8 +1530,6 @@ func (ps *Parser) unwrapNoscriptImages(doc *html.Node) {
 			}
 
 			dom.ReplaceChild(noscript.Parent, dom.FirstElementChild(tmpBody), prevElement)
-		} else {
-			dom.ReplaceChild(noscript.Parent, dom.FirstElementChild(tmpBody), noscript)
 		}
 	})
 }
