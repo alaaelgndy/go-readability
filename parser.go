@@ -1344,6 +1344,9 @@ func (ps *Parser) getArticleMetadata(jsonLd map[string]string) map[string]string
 		if content == "" {
 			return
 		}
+		if elementProperty == "article:published_time" {
+			values["datePublished"] = content
+		}
 		matches := []string{}
 		name := ""
 
@@ -1414,8 +1417,11 @@ func (ps *Parser) getArticleMetadata(jsonLd map[string]string) map[string]string
 	// get favicon
 	metadataFavicon := ps.getArticleFavicon()
 
-	metadataDatePublished := strOr(jsonLd["datePublished"], values["dcterms.available"],
-		values["dcterms.created"], values["dcterms.issued"])
+	metadataDatePublished := strOr(
+		jsonLd["datePublished"],
+		values["dcterms.available"],
+		values["dcterms.created"],
+		values["dcterms.issued"], values["datePublished"])
 	metadataDateModified := strOr(jsonLd["dateModified"], values["dcterms.modified"])
 
 	// in many sites the meta value is escaped with HTML entities,
