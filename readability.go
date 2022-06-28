@@ -19,6 +19,12 @@ import (
 	"golang.org/x/net/html"
 )
 
+var proxyURL string
+
+func SetProxies(proxies string) {
+	proxyURL = proxies
+}
+
 // FromReader parses an `io.Reader` and returns the readable content. It's the wrapper
 // or `Parser.Parse()` and useful if you only want to use the default parser.
 func FromReader(input io.Reader, pageURL *nurl.URL) (Article, error) {
@@ -43,7 +49,22 @@ func FromURL(pageURL string, timeout time.Duration) (Article, error) {
 	}
 
 	// Fetch page from URL
-	client := &http.Client{Timeout: timeout}
+	client := &http.Client{
+		Timeout: timeout,
+	}
+
+	if proxyURL != "" {
+		proxy, err := nurl.ParseRequestURI(proxyURL)
+
+		if err != nil {
+			fmt.Println("Could not parse the proxy url")
+		} else {
+			client.Transport = &http.Transport{
+				Proxy: http.ProxyURL(proxy),
+			}
+		}
+	}
+
 	resp, err := client.Get(pageURL)
 	if err != nil {
 		return Article{}, fmt.Errorf("failed to fetch the page: %v", err)
